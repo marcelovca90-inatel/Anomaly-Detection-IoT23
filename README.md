@@ -27,3 +27,10 @@ Tensorflow 2.4
 ## IoT-23 Dataset  
 Stratosphere Laboratory. A labeled dataset with malicious and benign IoT network traffic. January 22th. Agustin Parmisano, Sebastian Garcia, Maria Jose Erquiaga.  
 https://www.stratosphereips.org/datasets-iot23
+
+## Setup (marcelovca90)
+`conda create -n "doutorado" python=3.7 ipython`
+
+`conda activate doutorado`
+
+`conda install tensorflow keras matplotlib pandas scikit-learn scikit-learn-intelex`
