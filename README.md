@@ -34,3 +34,5 @@ https://www.stratosphereips.org/datasets-iot23
 `conda activate doutorado`
 
 `conda install tensorflow keras matplotlib pandas scikit-learn scikit-learn-intelex`
+
+`python -m pip install pactools`
