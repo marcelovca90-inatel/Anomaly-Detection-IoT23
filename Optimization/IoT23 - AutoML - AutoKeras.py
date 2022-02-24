@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import numpy as np
@@ -17,116 +17,129 @@ from sklearnex import patch_sklearn
 patch_sklearn()
 
 
-# In[2]:
+# In[ ]:
 
 
 SEED = 10
 
 
-# In[3]:
+# In[ ]:
 
 
 print(f"Execution started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.")
 
 
-# In[4]:
+# In[ ]:
 
 
-filepath = "../Data Preprocessing/iot23_combined_1000k.csv"
+filepath = "../Data Preprocessing/iot23_combined_3200k_4_classes.csv"
 df = pd.read_csv(filepath)
 
 
-# In[5]:
+# In[ ]:
 
 
 df
 
 
-# In[6]:
+# In[ ]:
 
 
 del df['Unnamed: 0']
 
 
-# In[7]:
+# In[ ]:
 
 
 df['label'].value_counts()
 
 
-# In[8]:
+# In[ ]:
 
 
-good = 'Benign'
-bad = 'PartOfAHorizontalPortScan'
-filtered_labels = df['label'].value_counts().index.drop([good,bad])
-for label in filtered_labels:
-    df.drop(df[df.label == label].index, inplace=True)
+relevant_labels = ['Benign','DDoS','PartOfAHorizontalPortScan','Okiru']
+
+# leave this block uncommented to remove 'irrelevant' labels
+if len(df['label'].value_counts()) != len(relevant_labels):
+    print(f'DF labels do not match the desired ones; some rows will be dropped.')
+    filtered_labels = df['label'].value_counts().index.drop(relevant_labels)
+    for label in filtered_labels:
+        df.drop(df[df.label == label].index, inplace=True)
+    print(df['label'].value_counts())
+else:
+    print(f'DF labels match the desired ones; no rows will be dropped.')
 
 
-# In[9]:
+# In[ ]:
 
 
-df['label'].value_counts()
-
-
-# In[10]:
-
-
-df.loc[(df.label == good), 'label'] = 0
-df.loc[(df.label == bad), 'label'] = 1
+# convert 'label' from categoric to numeric type
+for i in range(len(relevant_labels)):
+    df.loc[(df.label == relevant_labels[i]), 'label'] = i
 df = df.astype({'label': int})
 
 
-# In[11]:
+# In[ ]:
 
 
 df['label'].value_counts()
 
 
-# In[12]:
+# In[ ]:
 
 
 df
 
 
-# In[13]:
+# In[ ]:
 
 
 X = df.loc[:, df.columns != 'label']
 print(X.shape)
 
 
-# In[14]:
+# In[ ]:
 
 
 Y = df['label'].values
 print(Y.shape)
 
 
-# In[15]:
+# In[ ]:
 
 
-from sklearn.feature_selection import SelectKBest, SelectPercentile, SelectFpr, SelectFdr, SelectFwe
+from sklearn.feature_selection import VarianceThreshold, SelectFpr, SelectFdr, SelectFwe, SelectKBest, SelectPercentile
 from sklearn.feature_selection import chi2, f_classif, mutual_info_classif
-X = MinMaxScaler(feature_range=(0,1)).fit_transform(X,Y)
-X = SelectPercentile(percentile=1).fit_transform(X,Y)
-print(X.shape)
+
+X = VarianceThreshold(threshold=0).fit_transform(X,Y)    # remove constant features (i.e. with zero variance)
+print(f'Input shape after variance thresold filter: {X.shape}')
+
+X = MinMaxScaler(feature_range=(0,1)).fit_transform(X,Y) # scale data to [0,1] range
+print(f'Input shape after min-max feature scaling:  {X.shape}')
+
+X = VarianceThreshold(threshold=0).fit_transform(X,Y)    # remove constant features (i.e. with zero variance)
+print(f'Input shape after variance thresold filter: {X.shape}')
+
+X = SelectPercentile(percentile=1).fit_transform(X,Y)    # select top 1% features according to ANOVA F-value
+print(f'Input shape after percentile selection:     {X.shape}')
+
+X = VarianceThreshold(threshold=0).fit_transform(X,Y)    # remove constant features (i.e. with zero variance)
+print(f'Input shape after variance thresold filter: {X.shape}')
 
 
-# In[16]:
+# In[ ]:
 
 
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, random_state=SEED, test_size=0.2)
 
 
-# In[17]:
+# In[ ]:
 
 
-model = ak.StructuredDataClassifier(overwrite=True, max_trials=1)
+model = ak.StructuredDataClassifier(overwrite=True, max_trials=10)
 
 
-# In[18]:
+# In[ ]:
 
 
 start = time.time()
@@ -144,13 +157,14 @@ print('time cost: ')
 print(end - start, 'seconds')
 
 
-# In[19]:
+# In[ ]:
 
 
 best_model = model.export_model()
+print(best_model)
 
 
-# In[20]:
+# In[ ]:
 
 
 print("Evaluate on test data")
@@ -158,7 +172,7 @@ results = best_model.evaluate(X_test, Y_test)
 print("test loss, test acc:", results)
 
 
-# In[21]:
+# In[ ]:
 
 
 print(f"Execution finished at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.")

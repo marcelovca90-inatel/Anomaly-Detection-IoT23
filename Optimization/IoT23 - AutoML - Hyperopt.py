@@ -33,7 +33,7 @@ print(f"Execution started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.")
 # In[ ]:
 
 
-filepath = "../Data Preprocessing/iot23_combined_1000k.csv"
+filepath = "../Data Preprocessing/iot23_combined_3200k_4_classes.csv"
 df = pd.read_csv(filepath)
 
 
@@ -58,24 +58,25 @@ df['label'].value_counts()
 # In[ ]:
 
 
-good = 'Benign'
-bad = 'PartOfAHorizontalPortScan'
-filtered_labels = df['label'].value_counts().index.drop([good,bad])
-for label in filtered_labels:
-    df.drop(df[df.label == label].index, inplace=True)
+relevant_labels = ['Benign','DDoS','PartOfAHorizontalPortScan','Okiru']
+
+# leave this block uncommented to remove 'irrelevant' labels
+if len(df['label'].value_counts()) != len(relevant_labels):
+    print(f'DF labels do not match the desired ones; some rows will be dropped.')
+    filtered_labels = df['label'].value_counts().index.drop(relevant_labels)
+    for label in filtered_labels:
+        df.drop(df[df.label == label].index, inplace=True)
+    print(df['label'].value_counts())
+else:
+    print(f'DF labels match the desired ones; no rows will be dropped.')
 
 
 # In[ ]:
 
 
-df['label'].value_counts()
-
-
-# In[ ]:
-
-
-df.loc[(df.label == good), 'label'] = 0
-df.loc[(df.label == bad), 'label'] = 1
+# convert 'label' from categoric to numeric type
+for i in range(len(relevant_labels)):
+    df.loc[(df.label == relevant_labels[i]), 'label'] = i
 df = df.astype({'label': int})
 
 
@@ -108,11 +109,23 @@ print(Y.shape)
 # In[ ]:
 
 
-from sklearn.feature_selection import SelectKBest, SelectPercentile, SelectFpr, SelectFdr, SelectFwe
+from sklearn.feature_selection import VarianceThreshold, SelectFpr, SelectFdr, SelectFwe, SelectKBest, SelectPercentile
 from sklearn.feature_selection import chi2, f_classif, mutual_info_classif
-X = MinMaxScaler(feature_range=(0,1)).fit_transform(X,Y)
-X = SelectPercentile(percentile=1).fit_transform(X,Y)
-print(X.shape)
+
+X = VarianceThreshold(threshold=0).fit_transform(X,Y)    # remove constant features (i.e. with zero variance)
+print(f'Input shape after variance thresold filter: {X.shape}')
+
+X = MinMaxScaler(feature_range=(0,1)).fit_transform(X,Y) # scale data to [0,1] range
+print(f'Input shape after min-max feature scaling:  {X.shape}')
+
+X = VarianceThreshold(threshold=0).fit_transform(X,Y)    # remove constant features (i.e. with zero variance)
+print(f'Input shape after variance thresold filter: {X.shape}')
+
+X = SelectPercentile(percentile=1).fit_transform(X,Y)    # select top 1% features according to ANOVA F-value
+print(f'Input shape after percentile selection:     {X.shape}')
+
+X = VarianceThreshold(threshold=0).fit_transform(X,Y)    # remove constant features (i.e. with zero variance)
+print(f'Input shape after variance thresold filter: {X.shape}')
 
 
 # In[ ]:
