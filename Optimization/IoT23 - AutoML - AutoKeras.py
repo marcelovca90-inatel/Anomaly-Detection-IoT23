@@ -13,8 +13,6 @@ from datetime import datetime
 from matplotlib import pyplot
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from sklearnex import patch_sklearn
-patch_sklearn()
 
 
 # In[ ]:
