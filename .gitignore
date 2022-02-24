@@ -1,4 +1,4 @@
 .ipynb_checkpoints
-iot23_combined.csv
+*.csv
 Optimization/hyperopt_increments/
 Optimization/structured_data_classifier/
