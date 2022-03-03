@@ -1,4 +1,4 @@
 .ipynb_checkpoints
 *.csv
-Optimization/hyperopt_increments/
-Optimization/structured_data_classifier/
+**/hyperopt_increments/
+**/structured_data_classifier/
