@@ -29,10 +29,7 @@ Stratosphere Laboratory. A labeled dataset with malicious and benign IoT network
 https://www.stratosphereips.org/datasets-iot23
 
 ## Setup (marcelovca90)
-`conda create -n "doutorado" python=3.7 ipython`
-
-`conda activate doutorado`
-
-`conda install tensorflow keras matplotlib pandas scikit-learn scikit-learn-intelex`
-
-`python -m pip install pactools`
+1. If you plan to use TensorFlow with GPU, follow [these steps](https://ramseyelbasheer.io/2022/01/20/the-ultimate-tensorflow-gpu-installation-guide-for-2022-and-beyond/).
+2. `conda create -n "tf" python=3.9`
+3. `conda activate tf`
+4. `pip install numpy pandas tensorflow autokeras matplotlib pydot pydotplus graphviz plotly optuna scikit-learn-intelex xgboost hpsklearn hyperopt`
