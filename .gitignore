@@ -4,5 +4,6 @@
 *.json
 *.png
 **/Optimization/AutoML-AutoKeras/auto_model
-**/Optimization/AutoML-AutoKeras/structured_data_classifier/
-**/Optimization/AutoML-Hyperopt/increments/
+**/Optimization/AutoML-AutoKeras/structured_data_classifier
+**/Optimization/AutoML-Hyperopt/increments
+**/Optimization/AutoML-Optuna/catboost_info
