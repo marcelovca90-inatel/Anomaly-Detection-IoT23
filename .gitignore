@@ -1,4 +1,5 @@
 .ipynb_checkpoints
 *.csv
-**/hyperopt_increments/
-**/structured_data_classifier/
+*.inc
+**/Optimization/AutoML-AutoKeras/structured_data_classifier/
+**/Optimization/AutoML-Hyperopt/increments/
