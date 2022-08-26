@@ -8,3 +8,5 @@ Sebastian Garcia, Agustin Parmisano, & Maria Jose Erquiaga. (2020). IoT-23: A la
 2. `conda create -n "tf" python=3.9`
 3. `conda activate tf`
 4. `pip install numpy pandas tensorflow autokeras matplotlib pydot pydotplus graphviz plotly optuna scikit-learn-intelex xgboost hpsklearn hyperopt catboost`
+
+Note: for [process-based parallelization](https://optuna.readthedocs.io/en/stable/tutorial/10_key_features/004_distributed.html#distributed), the package `mysqlclient` must be installed too.
